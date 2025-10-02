@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Calculadora de Notaciones</title>
+  <title>Calculadoraa de Notaciones</title>
   <style>
     body { 
       font-family: Arial, sans-serif; 
@@ -13,7 +13,7 @@
       align-items: center;
     }
     h2 {
-      color:#333;
+      color:#fff;
       text-align:center;
     }
     .card {
@@ -25,7 +25,7 @@
       width: 100%;
       margin-top: 20px;
     }
-    input, select, button { 
+    input, button { 
       margin: 5px; 
       padding: 10px; 
       font-size: 16px;
@@ -59,20 +59,11 @@
   <h2>Calculadora y Conversor de Notaciones</h2>
   
   <div class="card">
-    <label for="tipo">Tipo de notación:</label><br>
-    <select id="tipo">
-      <option value="infija">Infija</option>
-      <option value="prefija">Prefija</option>
-      <option value="posfija">Posfija</option>
-    </select><br>
-
     <input type="text" id="expresion" placeholder="Escribe la expresión" style="width:90%;">
     <button onclick="calcular()">Calcular y Convertir</button>
-
     <div id="resultado"></div>
   </div>
-<script src="/bundle.js"></script>
-
+  <script src="./src/index.js"></script>
+  <script src="/bundle.js"></script>
 </body>
 </html>
-
