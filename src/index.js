@@ -1,106 +1,110 @@
-// ------------------- Detectar tipo de notación -------------------
-const detectarNotacion = (exp) => {
-  exp = exp.trim();
-  if (/^[+\-*/]/.test(exp)) return "prefija";
-  if (/[+\-*/]$/.test(exp)) return "posfija";
-  return "infija";
-};
+// index.js — Triplos y Cuádruplos mejorado con operaciones numéricas reales
 
-// ------------------- Función para formatear infija -------------------
-const formatearInfija = (exp) => exp
-  .replace(/([+\-*/()])/g, " $1 ")
-  .replace(/\s+/g, " ")
-  .trim();
+// ====== FUNCIÓN PRINCIPAL ======
+const generar = () => {
+  const tipo = document.getElementById("tipo").value;
+  const operacion = document.getElementById("operacion").value.trim();
+  const resultadoEl = document.getElementById("resultado");
+  const procesoEl = document.getElementById("proceso");
+  const historialEl = document.getElementById("historial");
 
-// ------------------- Función para formatear Prefija y Posfija -------------------
-const formatearPrefPos = (tokens) => tokens.join(' ');
-
-// ------------------- Función para tokenizar expresión infija -------------------
-const tokenizarInfija = (exp) => {
-  let tokens = [];
-  let i = 0;
-  while (i < exp.length) {
-    let c = exp[i];
-    if (/\d/.test(c)) {
-      let num = '';
-      while (i < exp.length && /\d/.test(exp[i])) {
-        num += exp[i];
-        i++;
-      }
-      tokens.push(num);
-      continue;
-    } else if (/[+\-*/()]/.test(c)) {
-      tokens.push(c);
-    }
-    i++;
-  }
-  return tokens;
-};
-
-// ------------------- Función principal -------------------
-const calcular = () => {
-  let expresion = document.getElementById("expresion").value.trim();
-  const resultadoDiv = document.getElementById("resultado");
-
-  if (!expresion) {
-    resultadoDiv.innerHTML = `<div class="res-box"><strong>Error:</strong> Ingresa una expresión</div>`;
+  if (!operacion) {
+    alert("Por favor, escribe una operación válida.");
     return;
   }
 
-  const tipo = detectarNotacion(expresion);
-  let resultado = "";
+  // ---- Variables base (puedes cambiarlas si gustas) ----
+  const valores = { a: 5, b: 3, c: 2, d: 4, e: 1, m: 6, n: 3, p: 2, q: 1, x: 4, y: 2, r: 3, z: 0 };
 
-  if (tipo === "infija") {
-    const tokens = tokenizarInfija(expresion);
-
-    let t0 = performance.now();
-    const prefijaTokens = infixToPrefix(tokens);
-    let t1 = performance.now();
-    const tiempoPrefija = (t1 - t0).toFixed(4);
-
-    t0 = performance.now();
-    const postfijaTokens = infixToPostfix(tokens);
-    t1 = performance.now();
-    const tiempoPostfija = (t1 - t0).toFixed(4);
-
-    resultado = `
-      <div class="res-box"><strong>Detectada:</strong> Infija</div>
-      <div class="res-box"><strong>Infija:</strong> ${formatearInfija(expresion)}</div>
-      <div class="res-box"><strong>Prefija:</strong> ${formatearPrefPos(prefijaTokens)}<br><small>⏱ ${tiempoPrefija} ms</small></div>
-      <div class="res-box"><strong>Posfija:</strong> ${formatearPrefPos(postfijaTokens)}<br><small>⏱ ${tiempoPostfija} ms</small></div>
-    `;
+  // ---- Reemplazar letras por valores numéricos ----
+  let expresion = operacion;
+  for (const [k, v] of Object.entries(valores)) {
+    const regex = new RegExp(`\\b${k}\\b`, "g");
+    expresion = expresion.replace(regex, v);
   }
 
-  resultadoDiv.innerHTML = resultado;
-};
+  // ---- Separar variable destino ----
+  const partes = expresion.split("=");
+  let variableDestino = "resultado";
+  let expresionEvaluar = expresion;
 
-// ------------------- Conversores usando tokens -------------------
-const infixToPostfix = (tokens) => {
-  let stack = [];
-  let output = [];
-  const prec = { "+":1, "-":1, "*":2, "/":2 };
+  if (partes.length === 2) {
+    variableDestino = partes[0].trim();
+    expresionEvaluar = partes[1].trim();
+  }
 
-  tokens.forEach(ch => {
-    if (/\d/.test(ch) || /[a-zA-Z]/.test(ch)) output.push(ch);
-    else if (ch === "(") stack.push(ch);
-    else if (ch === ")") {
-      while (stack.length && stack[stack.length-1] !== "(") output.push(stack.pop());
-      stack.pop();
-    } else if (prec[ch]) {
-      while (stack.length && prec[stack[stack.length-1]] >= prec[ch]) output.push(stack.pop());
-      stack.push(ch);
+  // ---- Evaluar resultado real ----
+  let valorFinal;
+  try {
+    valorFinal = eval(expresionEvaluar);
+  } catch (error) {
+    resultadoEl.textContent = "Error en la operación.";
+    procesoEl.textContent = "";
+    return;
+  }
+
+  // ---- Mostrar resultado ----
+  resultadoEl.textContent = `${variableDestino} = ${valorFinal}`;
+
+  // ---- Analizar operación paso a paso ----
+  const operadores = expresionEvaluar.match(/[\+\-\*\/]/g) || [];
+  const operandos = expresionEvaluar.split(/[\+\-\*\/\(\)]+/).filter(Boolean);
+
+  // ---- Generar proceso (simplificado) ----
+  let pasosTriplo = "=== PROCESO DE TRIPLOS ===\n";
+  let pasosCuadruplo = "=== PROCESO DE CUÁDRUPLOS ===\n";
+
+  let temporales = [];
+  let tCount = 1;
+
+  // Ejemplo: procesa * y / primero, luego + y -
+  const prioridad = ['*', '/', '+', '-'];
+  let expresionTemp = expresionEvaluar;
+
+  prioridad.forEach(op => {
+    let regex = new RegExp(`(\\d+(?:\\.\\d+)?)(\\${op})(\\d+(?:\\.\\d+)?)`);
+    while (regex.test(expresionTemp)) {
+      expresionTemp = expresionTemp.replace(regex, (match, izq, operador, der) => {
+        const temp = `t${tCount++}`;
+        temporales.push({ operador, izq, der, temp });
+        return temp;
+      });
     }
   });
 
-  while (stack.length) output.push(stack.pop());
-  return output;
+  // Generar pasos de triplos
+  temporales.forEach((t, i) => {
+    pasosTriplo += `(${i + 1}) (${t.operador}, ${t.izq}, ${t.der})\n`;
+  });
+  pasosTriplo += `(${temporales.length + 1}) (=, ${temporales.at(-1)?.temp || expresionEvaluar}, ${variableDestino})\n`;
+
+  // Generar pasos de cuádruplos
+  temporales.forEach((t, i) => {
+    pasosCuadruplo += `(${i + 1}) (${t.operador}, ${t.izq}, ${t.der}, ${t.temp})\n`;
+  });
+  pasosCuadruplo += `(${temporales.length + 1}) (=, ${temporales.at(-1)?.temp || expresionEvaluar}, —, ${variableDestino})\n`;
+
+  // ---- Mostrar proceso según selección ----
+  let procesoTexto = "";
+  if (tipo === "triplo") procesoTexto = pasosTriplo;
+  else if (tipo === "cuadruplo") procesoTexto = pasosCuadruplo;
+  else procesoTexto = `${pasosTriplo}\n${pasosCuadruplo}`;
+
+  procesoEl.textContent = procesoTexto;
+
+  // ---- Agregar al historial ----
+  const li = document.createElement("li");
+  li.textContent = `${operacion} = ${valorFinal}`;
+  historialEl.appendChild(li);
 };
 
-const infixToPrefix = (tokens) => {
-  // invertir tokens
-  let reversed = tokens.slice().reverse().map(t => t === "(" ? ")" : t === ")" ? "(" : t);
-  let postfix = infixToPostfix(reversed);
-  return postfix.reverse();
+// ====== LIMPIAR CAMPOS (sin borrar historial) ======
+const limpiar = () => {
+  document.getElementById("operacion").value = "";
+  document.getElementById("resultado").textContent = "";
+  document.getElementById("proceso").textContent = "";
 };
 
-window.calcular = calcular;
+// ====== EVENTOS ======
+document.getElementById("generar").addEventListener("click", generar);
+document.getElementById("limpiar").addEventListener("click", limpiar);
