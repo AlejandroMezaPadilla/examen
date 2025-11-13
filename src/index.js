@@ -1,110 +1,101 @@
-// index.js — Triplos y Cuádruplos mejorado con operaciones numéricas reales
+// 🧩 Conversión de notación polaca (prefija) a infija
+const polacaAInfix = (tokens) => {
+  const stack = [];
+  const operadores = ["+", "-", "*", "/"];
 
-// ====== FUNCIÓN PRINCIPAL ======
-const generar = () => {
-  const tipo = document.getElementById("tipo").value;
-  const operacion = document.getElementById("operacion").value.trim();
-  const resultadoEl = document.getElementById("resultado");
-  const procesoEl = document.getElementById("proceso");
-  const historialEl = document.getElementById("historial");
-
-  if (!operacion) {
-    alert("Por favor, escribe una operación válida.");
-    return;
-  }
-
-  // ---- Variables base (puedes cambiarlas si gustas) ----
-  const valores = { a: 5, b: 3, c: 2, d: 4, e: 1, m: 6, n: 3, p: 2, q: 1, x: 4, y: 2, r: 3, z: 0 };
-
-  // ---- Reemplazar letras por valores numéricos ----
-  let expresion = operacion;
-  for (const [k, v] of Object.entries(valores)) {
-    const regex = new RegExp(`\\b${k}\\b`, "g");
-    expresion = expresion.replace(regex, v);
-  }
-
-  // ---- Separar variable destino ----
-  const partes = expresion.split("=");
-  let variableDestino = "resultado";
-  let expresionEvaluar = expresion;
-
-  if (partes.length === 2) {
-    variableDestino = partes[0].trim();
-    expresionEvaluar = partes[1].trim();
-  }
-
-  // ---- Evaluar resultado real ----
-  let valorFinal;
-  try {
-    valorFinal = eval(expresionEvaluar);
-  } catch (error) {
-    resultadoEl.textContent = "Error en la operación.";
-    procesoEl.textContent = "";
-    return;
-  }
-
-  // ---- Mostrar resultado ----
-  resultadoEl.textContent = `${variableDestino} = ${valorFinal}`;
-
-  // ---- Analizar operación paso a paso ----
-  const operadores = expresionEvaluar.match(/[\+\-\*\/]/g) || [];
-  const operandos = expresionEvaluar.split(/[\+\-\*\/\(\)]+/).filter(Boolean);
-
-  // ---- Generar proceso (simplificado) ----
-  let pasosTriplo = "=== PROCESO DE TRIPLOS ===\n";
-  let pasosCuadruplo = "=== PROCESO DE CUÁDRUPLOS ===\n";
-
-  let temporales = [];
-  let tCount = 1;
-
-  // Ejemplo: procesa * y / primero, luego + y -
-  const prioridad = ['*', '/', '+', '-'];
-  let expresionTemp = expresionEvaluar;
-
-  prioridad.forEach(op => {
-    let regex = new RegExp(`(\\d+(?:\\.\\d+)?)(\\${op})(\\d+(?:\\.\\d+)?)`);
-    while (regex.test(expresionTemp)) {
-      expresionTemp = expresionTemp.replace(regex, (match, izq, operador, der) => {
-        const temp = `t${tCount++}`;
-        temporales.push({ operador, izq, der, temp });
-        return temp;
-      });
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    const token = tokens[i];
+    if (!operadores.includes(token)) {
+      stack.push(token);
+    } else {
+      const [op1, op2] = [stack.pop(), stack.pop()];
+      stack.push(`(${op1} ${token} ${op2})`);
     }
-  });
-
-  // Generar pasos de triplos
-  temporales.forEach((t, i) => {
-    pasosTriplo += `(${i + 1}) (${t.operador}, ${t.izq}, ${t.der})\n`;
-  });
-  pasosTriplo += `(${temporales.length + 1}) (=, ${temporales.at(-1)?.temp || expresionEvaluar}, ${variableDestino})\n`;
-
-  // Generar pasos de cuádruplos
-  temporales.forEach((t, i) => {
-    pasosCuadruplo += `(${i + 1}) (${t.operador}, ${t.izq}, ${t.der}, ${t.temp})\n`;
-  });
-  pasosCuadruplo += `(${temporales.length + 1}) (=, ${temporales.at(-1)?.temp || expresionEvaluar}, —, ${variableDestino})\n`;
-
-  // ---- Mostrar proceso según selección ----
-  let procesoTexto = "";
-  if (tipo === "triplo") procesoTexto = pasosTriplo;
-  else if (tipo === "cuadruplo") procesoTexto = pasosCuadruplo;
-  else procesoTexto = `${pasosTriplo}\n${pasosCuadruplo}`;
-
-  procesoEl.textContent = procesoTexto;
-
-  // ---- Agregar al historial ----
-  const li = document.createElement("li");
-  li.textContent = `${operacion} = ${valorFinal}`;
-  historialEl.appendChild(li);
+  }
+  return stack[0];
 };
 
-// ====== LIMPIAR CAMPOS (sin borrar historial) ======
-const limpiar = () => {
-  document.getElementById("operacion").value = "";
-  document.getElementById("resultado").textContent = "";
-  document.getElementById("proceso").textContent = "";
+// ⚙️ Evaluar notación polaca
+const evaluarPolaca = (tokens) => {
+  const stack = [];
+  const operadores = ["+", "-", "*", "/"];
+
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    const token = tokens[i];
+    if (!operadores.includes(token)) {
+      stack.push(parseFloat(token));
+    } else {
+      const [a, b] = [stack.pop(), stack.pop()];
+      const resultado =
+        token === "+" ? a + b :
+        token === "-" ? a - b :
+        token === "*" ? a * b :
+        token === "/" ? a / b : 0;
+      stack.push(resultado);
+    }
+  }
+  return stack.pop();
 };
 
-// ====== EVENTOS ======
-document.getElementById("generar").addEventListener("click", generar);
-document.getElementById("limpiar").addEventListener("click", limpiar);
+// 🎯 Elementos del DOM
+const inputExpresion = document.getElementById("inputExpresion");
+const expresionNormal = document.getElementById("expresionNormal");
+const resultado = document.getElementById("resultado");
+const btnGuardar = document.getElementById("btnGuardar");
+const btnLimpiar = document.getElementById("btnLimpiar");
+const historialDiv = document.getElementById("historial");
+
+let historial = [];
+
+// 🕹️ Función para mostrar resultados
+const actualizarVista = () => {
+  const tokens = inputExpresion.value.trim().split(" ");
+  if (tokens.length > 1) {
+    try {
+      expresionNormal.textContent = polacaAInfix(tokens);
+      resultado.textContent = evaluarPolaca(tokens);
+    } catch {
+      expresionNormal.textContent = "Expresión inválida";
+      resultado.textContent = "---";
+    }
+  } else {
+    expresionNormal.textContent = "---";
+    resultado.textContent = "---";
+  }
+};
+
+// 📦 Renderizar historial
+const renderHistorial = () => {
+  historialDiv.innerHTML = historial
+    .map(
+      (item, i) =>
+        `<p class="history-item">${i + 1}. ${item.polaca} → ${item.normal} = ${item.res}</p>`
+    )
+    .join("");
+};
+
+// 💾 Guardar operación
+const guardarOperacion = () => {
+  if (resultado.textContent !== "---" && inputExpresion.value.trim() !== "") {
+    historial.push({
+      polaca: inputExpresion.value.trim(),
+      normal: expresionNormal.textContent,
+      res: resultado.textContent,
+    });
+    renderHistorial();
+    limpiarCampos();
+  }
+};
+
+// 🧹 Limpiar campos
+const limpiarCampos = () => {
+  inputExpresion.value = "";
+  expresionNormal.textContent = "---";
+  resultado.textContent = "---";
+};
+
+// 🧠 Eventos
+inputExpresion.addEventListener("keyup", actualizarVista);   
+inputExpresion.addEventListener("change", actualizarVista);   
+btnGuardar.addEventListener("click", guardarOperacion);
+btnLimpiar.addEventListener("click", limpiarCampos);
