@@ -1,4 +1,3 @@
-// 🧩 Conversión de notación polaca (prefija) a infija
 const polacaAInfix = (tokens) => {
   const stack = [];
   const operadores = ["+", "-", "*", "/"];
@@ -15,7 +14,6 @@ const polacaAInfix = (tokens) => {
   return stack[0];
 };
 
-// ⚙️ Evaluar notación polaca
 const evaluarPolaca = (tokens) => {
   const stack = [];
   const operadores = ["+", "-", "*", "/"];
@@ -37,7 +35,6 @@ const evaluarPolaca = (tokens) => {
   return stack.pop();
 };
 
-// 🎯 Elementos del DOM
 const inputExpresion = document.getElementById("inputExpresion");
 const expresionNormal = document.getElementById("expresionNormal");
 const resultado = document.getElementById("resultado");
@@ -47,7 +44,6 @@ const historialDiv = document.getElementById("historial");
 
 let historial = [];
 
-// 🕹️ Función para mostrar resultados
 const actualizarVista = () => {
   const tokens = inputExpresion.value.trim().split(" ");
   if (tokens.length > 1) {
@@ -64,7 +60,6 @@ const actualizarVista = () => {
   }
 };
 
-// 📦 Renderizar historial
 const renderHistorial = () => {
   historialDiv.innerHTML = historial
     .map(
@@ -74,7 +69,6 @@ const renderHistorial = () => {
     .join("");
 };
 
-// 💾 Guardar operación
 const guardarOperacion = () => {
   if (resultado.textContent !== "---" && inputExpresion.value.trim() !== "") {
     historial.push({
@@ -87,14 +81,12 @@ const guardarOperacion = () => {
   }
 };
 
-// 🧹 Limpiar campos
 const limpiarCampos = () => {
   inputExpresion.value = "";
   expresionNormal.textContent = "---";
   resultado.textContent = "---";
 };
 
-// 🧠 Eventos
 inputExpresion.addEventListener("keyup", actualizarVista);   
 inputExpresion.addEventListener("change", actualizarVista);   
 btnGuardar.addEventListener("click", guardarOperacion);
