@@ -1,6 +1,3 @@
-import "./styles.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 document.getElementById("buscar").addEventListener("click", () => {
   const expresion = document.getElementById("regex").value.trim();
