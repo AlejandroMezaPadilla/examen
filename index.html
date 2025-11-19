@@ -1,124 +1,29 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Notación Polaca (Prefija)</title>
-    <style>
-      body {
-        background: #1e1e2f;
-        font-family: "Segoe UI", sans-serif;
-        color: #f5f5f5;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        margin: 0;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validador de Expresiones Regulares</title>
+</head>
 
-      h1 {
-        margin-bottom: 20px;
-        color: #ffd700;
-        font-weight: 500;
-      }
+<body>
 
-      .container {
-        background: #2c2c3a;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
-        width: 90%;
-        max-width: 380px;
-        text-align: center;
-      }
+  <div class="container">
+    <h2>Buscador con Expresiones Regulares</h2>
 
-      input {
-        width: 90%;
-        padding: 10px;
-        border: none;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        font-size: 16px;
-        text-align: center;
-      }
+    <label>Expresión Regular:</label>
+    <input type="text" id="regex" placeholder="Escribe tu expresión regular...">
 
-      button {
-        margin: 6px;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 8px;
-        background-color: #4caf50;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
+    <label>Texto donde buscar:</label>
+    <textarea id="texto" rows="5" placeholder="Escribe un texto aquí..."></textarea>
 
-      button:hover {
-        background-color: #3e8e41;
-      }
+    <button id="buscar">Buscar coincidencias</button>
 
-      .output {
-        margin-top: 15px;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 17px;
-      }
+    <div id="resultado"></div>
+  </div>
 
-      .history {
-        margin-top: 20px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        padding: 10px;
-        text-align: left;
-        max-height: 120px;
-        overflow-y: auto;
-      }
 
-      .history h3 {
-        text-align: center;
-        margin-bottom: 8px;
-        font-weight: 500;
-      }
+  <script src="bundle.js"></script>
 
-      .history-item {
-        margin: 3px 0;
-        font-size: 14px;
-        color: #ccc;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Notación Polaca (Prefija)</h1>
-      <input
-        type="text"
-        id="inputExpresion"
-        placeholder="Ejemplo: + 3 * 2 5"
-      />
-      <div>
-        <button id="btnGuardar">Almacenar</button>
-        <button id="btnLimpiar">Limpiar</button>
-      </div>
-
-      <div class="output">
-        <p>
-          <strong>Expresión normal:</strong>
-          <span id="expresionNormal">---</span>
-        </p>
-        <p>
-          <strong>Resultado:</strong>
-          <span id="resultado">---</span>
-        </p>
-      </div>
-
-      <div class="history">
-        <h3>Historial</h3>
-        <div id="historial"></div>
-      </div>
-    </div>
-
-    <script src="bundle.js"></script>
-  </body>
+</body>
 </html>
